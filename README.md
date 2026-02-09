@@ -83,12 +83,11 @@ BRIEF.md is the counter-position: context owned by the creator, readable by any 
 ## Repository Structure
 
 ```
-spec/                # Core BRIEF.md specification
-├── SPECIFICATION.md # The spec (~400 lines) — start here
+.
+├── SPECIFICATION.md       # The core spec (~400 lines) — start here
 ├── IMPLEMENTATION_GUIDE.md # For tool builders and advanced users
-examples/            # Real-world examples by domain
-RFCs/                # Proposals and discussion documents
-extensions/          # Extension specifications (sonic_arts, narrative_creative, etc.)
+├── README.md              # This file
+├── LICENSE                # CC-BY 4.0 License
 ```
 
 ## Status
