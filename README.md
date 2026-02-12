@@ -1,4 +1,6 @@
-# BRIEF.md — An Open Context File for Projects
+# BRIEF.md: An Open Context File for Projects
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18614773.svg)](https://doi.org/10.5281/zenodo.18614773)
 
 ## The Problem
 
@@ -12,11 +14,13 @@ Most tools preserve state. None preserve meaning.
 
 BRIEF.md is a simple Markdown file placed at the root of a project that captures:
 
-- **What This Is** — a clear description of the project
-- **What This Is NOT** — boundaries and constraints
-- **Why This Exists** — motivation and intended outcome
-- **Key Decisions** — choices made, with rationale and rejected alternatives
-- **Open Questions** — what's unresolved, and what should stay unresolved
+- **What This Is**: a clear description of the project
+- **What This Is NOT**: boundaries and constraints
+- **Why This Exists**: motivation and intended outcome
+- **Key Decisions**: choices made, with rationale and rejected alternatives
+- **Open Questions**: what's unresolved, and what should stay unresolved
+- **Extensions**: domain-specific frameworks (e.g., Sonic Arts, System Design)
+- **Project-Specific**: unique sections that don't fit anywhere else
 
 Think of it as a README for *intent*, not implementation.
 
@@ -39,20 +43,20 @@ To capture the feeling of wanting to leave but being stuck.
 
 # Key Decisions
 
-### WHAT: Verse 2 stays in the same location as Verse 1 — no scene change
+### WHAT: Verse 2 stays in the same location as Verse 1 (no scene change)
 **WHY:** Early drafts moved the narrator to the train station. It felt like
-progress, but the song is about stasis — nothing changes. Keeping the narrator
+progress, but the song is about stasis; nothing changes. Keeping the narrator
 in bed makes the final line ("I'll go tomorrow") land as self-deception.
 **WHEN:** 2026-01-20
 **ALTERNATIVES CONSIDERED:**
-- Move to train station → rejected: false sense of momentum
-- Move to the porch → rejected: still felt like "doing something"
+- Move to train station -> rejected: false sense of momentum
+- Move to the porch -> rejected: still felt like "doing something"
 
 # Open Questions
 
 ## To Keep Open
 - Whether the narrator is addressing themselves or someone who left
-  (both readings add something — resolving it would flatten the lyric)
+  (both readings add something; resolving it would flatten the lyric)
 ```
 
 ## What BRIEF.md Is Not
@@ -66,11 +70,11 @@ It is intentionally minimal and flexible. A half-finished BRIEF.md is a starting
 
 ## Who Is This For?
 
-- **Creators** (music, writing, design) — preserve the thinking behind your work across sessions and tools
-- **Developers** — extend what README and agent.md do with decision records and hierarchical context
-- **AI tool users** — give AI a shared reference point instead of re-explaining your project every session
-- **Researchers** — study context preservation as an HCI design concern
-- **Tool builders** — integrate a portable, open context format
+- **Creators** (music, writing, design): preserve the thinking behind your work across sessions and tools
+- **Developers**: extend what README and agent.md do with decision records and hierarchical context
+- **AI tool users**: give AI a shared reference point instead of re-explaining your project every session
+- **Researchers**: study context preservation as an HCI design concern
+- **Tool builders**: integrate a portable, open context format
 
 You can use BRIEF.md alone, by hand, without any tool support.
 
@@ -83,12 +87,13 @@ BRIEF.md is the counter-position: context owned by the creator, readable by any 
 ## Repository Structure
 
 ```
-.
-├── SPECIFICATION.md       # The core spec (~400 lines) — start here
-├── IMPLEMENTATION_GUIDE.md # For tool builders and advanced users
-├── README.md              # This file
-├── LICENSE                # CC-BY 4.0 License
-```
+ .
+ ├── SPECIFICATION.md       # The core spec (~400 lines). Start here.
+ ├── IMPLEMENTATION_GUIDE.md # For tool builders and advanced users
+ ├── README.md              # This file
+ ├── LICENSE                # CC-BY 4.0 License
+ └── BRIEF_md_White_Paper.pdf # Theoretical foundation and research questions
+ ```
 
 ## Status
 
@@ -102,7 +107,9 @@ There is no formal governance yet. If you have feedback, edge cases, critiques, 
 
 Created by Gyles Gyesie ([ORCID](https://orcid.org/0009-0008-3394-9243)).
 
-BRIEF.md synthesises architectural decision records, project identity files, and domain-specific metadata into a portable, hierarchical context artifact — and applies it to creative work for the first time.
+**DOI:** [10.5281/zenodo.18614773](https://doi.org/10.5281/zenodo.18614773) (White Paper)
+
+BRIEF.md synthesises architectural decision records, project identity files, and domain-specific metadata into a portable, hierarchical context artifact, and applies it to creative work for the first time.
 
 The concept of *context decay* as applied to project workflows, the BRIEF.md specification, and the supporting theoretical framework were originated by Gyles Gyesie in 2025–2026.
 

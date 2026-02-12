@@ -59,8 +59,8 @@ Tools that write BRIEF.md files SHOULD output the canonical format. Tools that r
 - Underscores for multi-word types: `song`, `album`, `product_line`
 
 **Extension names:**
-- In markdown headings: ALL CAPS with spaces — `# SONIC ARTS`
-- In metadata field: lowercase with underscores, comma-separated — `**Extensions:** sonic_arts, narrative_creative`
+- In markdown headings: ALL CAPS with spaces: `# SONIC ARTS`
+- In metadata field: lowercase with underscores, comma-separated: `**Extensions:** sonic_arts, narrative_creative`
 
 ### Character Encoding
 
@@ -137,7 +137,7 @@ acme-corp/
                 └── BRIEF.md    # Feature: "configurable retry with backoff"
 ```
 
-### No Inheritance — Advisory Context
+### No Inheritance: Advisory Context
 
 Context from parent BRIEF.md files is **advisory, not prescriptive**:
 
@@ -148,9 +148,9 @@ Context from parent BRIEF.md files is **advisory, not prescriptive**:
 
 Conflict detection between parent and child BRIEF.md files is implementation-specific. Future versions of this spec may provide guidance on conflict semantics.
 
-### Walking Down — Collection Discovery
+### Walking Down: Collection Discovery
 
-The up-walk is the core mechanism: discover the bigger context around the file you've opened. But tools can also **walk down** the hierarchy — scanning child directories for BRIEF.md files to show what a collection contains.
+The up-walk is the core mechanism: discover the bigger context around the file you've opened. But tools can also **walk down** the hierarchy: scanning child directories for BRIEF.md files to show what a collection contains.
 
 Use cases for walking down:
 - An artist-level view that shows themes across all albums and songs
@@ -159,7 +159,7 @@ Use cases for walking down:
 
 Implementation notes:
 - Walking down is an intentional user action (e.g., "show me what's in this collection"), not something that triggers on every file open
-- Down-walks can be expensive in large hierarchies — consider lazy loading or depth limits
+- Down-walks can be expensive in large hierarchies: consider lazy loading or depth limits
 - Tools SHOULD handle directories without BRIEF.md files gracefully (skip, don't error)
 
 ---
@@ -366,7 +366,7 @@ These two metadata fields serve different purposes and are independent of each o
 **Extensions** = conceptual frameworks this project USES.
 - Cross-cutting (same extension used by multiple types)
 - Examples: SONIC ARTS, NARRATIVE CREATIVE
-- Optional — use what fits
+- Optional: use what fits
 
 **Examples of flexibility:**
 
@@ -415,7 +415,7 @@ film/scenes/s02/BRIEF.md   # Scene-specific context
 
 The format is the same; the dynamics differ:
 
-**Solo creators:** BRIEF.md is mainly communication with your future self. Focus on the sections most likely to fade — Key Decisions, What This Is NOT, and motivational context (Why This Exists). You'll remember *what* the project is; you won't remember *why* you made specific choices.
+**Solo creators:** BRIEF.md is mainly communication with your future self. Focus on the sections most likely to fade: Key Decisions, What This Is NOT, and motivational context (Why This Exists). You'll remember *what* the project is; you won't remember *why* you made specific choices.
 
 **Teams:** BRIEF.md is alignment infrastructure. Focus on Key Decisions (prevents re-litigating resolved debates), constraints (prevents conflicting changes), and Open Questions (makes uncertainty visible). New team members read BRIEF.md to understand "why we built it this way" without archaeological digging.
 
@@ -459,7 +459,7 @@ If a question needs time to resolve (days or weeks of deliberation), log it as a
 
 - Commit BRIEF.md alongside related project changes
 - Use meaningful commit messages
-- Git provides complete change history — no need for separate versioning in the file
+- Git provides complete change history: no need for separate versioning in the file
 - Treat BRIEF.md changes as significant events
 
 ### Multi-Author Projects
@@ -499,7 +499,7 @@ BRIEF.md files are typically private during development. After release, certain 
 
 ### What Might Be Public After Release
 
-**Potentially shareable:** Themes, genres, moods, instrumentation, production techniques, architecture patterns, technology choices — metadata that helps discovery.
+**Potentially shareable:** Themes, genres, moods, instrumentation, production techniques, architecture patterns, technology choices: metadata that helps discovery.
 
 **Typically private:** Key Decisions (reveals strategic reasoning), Open Questions (shows internal process), "What This Is NOT" (may reveal competitive positioning).
 
@@ -509,12 +509,12 @@ These are considerations, not rules. Your context determines what to share.
 
 Tools that export metadata to public platforms SHOULD:
 
-1. **Allow user review** — show exactly what will be made public
+1. **Allow user review**: show exactly what will be made public
 2. **Require explicit approval** before export
-3. **Provide selection interface** — allow users to include/exclude specific fields
-4. **Provide sensible defaults** — typically excluding Key Decisions and Open Questions
-5. **Map to platform formats** — convert BRIEF.md metadata to platform-specific taxonomies
-6. **Respect user control** — support "keep everything private" as a valid choice
+3. **Provide selection interface**: allow users to include/exclude specific fields
+4. **Provide sensible defaults**: typically excluding Key Decisions and Open Questions
+5. **Map to platform formats**: convert BRIEF.md metadata to platform-specific taxonomies
+6. **Respect user control**: support "keep everything private" as a valid choice
 
 **Privacy principle:** Users retain full control over what becomes public. The default is private. Public exposure requires explicit user action.
 
