@@ -19,6 +19,11 @@ This guide is for tool builders, advanced users, and anyone integrating BRIEF.md
 - [Security Considerations](#security-considerations)
 - [Metadata Lifecycle and Public Exposure](#metadata-lifecycle-and-public-exposure)
 - [Versioning](#versioning)
+- [Ontology Pack Architecture (Planned)](#ontology-pack-architecture-planned)
+- [Type Guide System (Planned)](#type-guide-system-planned)
+- [Project Maturity Assessment](#project-maturity-assessment)
+- [Configuration](#configuration)
+- [Building a BRIEF.md Integration](#building-a-briefmd-integration)
 
 ---
 
@@ -61,6 +66,10 @@ Tools that write BRIEF.md files SHOULD output the canonical format. Tools that r
 **Extension names:**
 - In markdown headings: ALL CAPS with spaces: `# SONIC ARTS`
 - In metadata field: lowercase with underscores, comma-separated: `**Extensions:** sonic_arts, narrative_creative`
+
+### Section Heading Aliases
+
+Tools SHOULD accept core section headings in multiple languages and common English variations. See the Internationalisation section in [SPECIFICATION.md](SPECIFICATION.md) for the full alias table. Matching is case-insensitive. Tools that write BRIEF.md files SHOULD output the canonical English headings.
 
 ### Character Encoding
 
@@ -146,7 +155,17 @@ Context from parent BRIEF.md files is **advisory, not prescriptive**:
 - Tools warn about conflicts but don't enforce
 - Users make final choices
 
-Conflict detection between parent and child BRIEF.md files is implementation-specific. Future versions of this spec may provide guidance on conflict semantics.
+#### Conflict Detection
+
+The reference implementation uses a two-layer conflict detection approach:
+
+**Layer 1: Heuristic** — Compare decision-to-decision, decision-to-constraint, and constraint-to-constraint pairs within a single BRIEF.md and across the parent/child hierarchy. Resolution options: `supersede` (replace the old decision), `exception` (scoped override), `update` (amend the original), or `dismiss` (acknowledge and move on).
+
+**Layer 2: Semantic (optional)** — When AI capabilities are available, decision pairs can be analysed for semantic contradiction. Use a confidence threshold (recommended: 0.6 minimum) to avoid false positives. Deduplicate against heuristic results.
+
+**Conflict suppression via intentional tensions:** When a project type has known creative or technical tensions (e.g., "authenticity vs. polish" in music, "speed vs. quality" in software), the conflict checker should treat matching decision pairs as intentional trade-offs rather than contradictions.
+
+Conflict detection remains optional — tools at Level 1 or Level 2 integration are not expected to implement it.
 
 ### Walking Down: Collection Discovery
 
@@ -245,17 +264,18 @@ The IDE can then:
 ### Version Compatibility
 
 **Forward compatibility (reading newer versions):**
-- Tools reading v1.0 SHOULD accept v1.x files
+- Tools reading v2.0 SHOULD accept v2.x files
 - Tools SHOULD ignore new fields added in minor versions
-- Tools SHOULD warn on major version mismatches (v2.0)
+- Tools SHOULD warn on major version mismatches
 
 **Backward compatibility (reading older versions):**
-- Tools implementing v1.1+ SHOULD support v1.0 files
-- Tools MUST NOT require fields added in minor versions
+- Tools implementing v2.0 SHOULD support v1.0 files
+- Tools MUST NOT require fields added in v2.0 (e.g., decision relationship fields)
+- v1.0 files are valid v2.0 files — no migration needed
 
 **Version indicators:**
-- Files MAY include `**Version:** 1.0` in metadata
-- If absent, assume latest v1.x
+- Files MAY include `**Version:** 2.0` in metadata
+- If absent, assume latest v2.x
 
 ### Preserving User Content
 
@@ -341,16 +361,9 @@ Anyone can propose a new extension. For now, proposals are welcome as GitHub iss
 - Recommended ontologies (if any)
 - How tools should interpret the data
 
-### Current Extensions Under Development
+### Extension Status
 
-| Extension | Covers | Used By |
-|---|---|---|
-| SONIC ARTS | Aesthetic, sound, production | Music, film, games |
-| NARRATIVE CREATIVE | Themes, story, perspective | Songs, films, novels, games |
-| LYRICAL CRAFT | Word choice, imagery, constraints | Songs, poetry, writing |
-| VISUAL STORYTELLING | Visual style, cinematography | Films, games, marketing |
-| STRATEGIC PLANNING | Goals, constraints, assumptions | Products, research, business |
-| SYSTEM DESIGN | Architecture, requirements | Software, engineering |
+No extensions have been formally published yet. The names used in examples throughout this guide (SONIC ARTS, STRATEGIC PLANNING, SYSTEM DESIGN, etc.) illustrate the extension pattern but are not stable specifications. See the core specification for how to propose new extensions.
 
 ---
 
@@ -531,7 +544,190 @@ This specification uses semantic versioning:
 
 ### File Versioning
 
-Individual BRIEF.md files may include a `**Version:**` field indicating which spec version they follow. If omitted, tools assume latest v1.x.
+Individual BRIEF.md files may include a `**Version:**` field indicating which spec version they follow. If omitted, tools assume latest v2.x.
+
+---
+
+## Ontology Pack Architecture (Planned)
+
+> **Status:** This architecture is implemented in the MCP reference server. No ontology packs have been formally published yet. The format may evolve before stable release.
+
+### What Ontology Packs Are
+
+The spec mentions that extension fields can draw from external ontologies. The reference implementation provides a concrete pack system for distributing, installing, and querying these ontologies.
+
+A pack is a JSON file containing a named collection of entries with searchable metadata. Packs are stored at `~/.brief/ontologies/{packName}/pack.json`.
+
+### Pack Format
+
+```json
+{
+  "name": "theme-pack",
+  "version": "1.0.0",
+  "description": "Literary and narrative themes",
+  "searchFields": ["label", "keywords", "aliases"],
+  "synonyms": { "longing": ["yearning", "desire", "pining"] },
+  "entries": [
+    {
+      "id": "nostalgia",
+      "label": "Nostalgia",
+      "description": "A sentimental longing for the past",
+      "keywords": ["memory", "past", "longing"],
+      "aliases": ["nostalgic"],
+      "categories": ["emotion", "temporal"],
+      "tags": ["reflective"],
+      "parentId": null,
+      "references": []
+    }
+  ]
+}
+```
+
+**Pack-level fields:** `name` (required), `version`, `description`, `searchFields` (which entry fields to index — default: label, keywords, aliases), `synonyms` (pack-level synonym map for search expansion).
+
+**Entry fields:** `id` (required), `label` (required), `description`, `keywords`, `aliases`, `categories`, `tags`, `parentId` (for tree structures), `references` (array of source objects).
+
+### Ontology Tagging
+
+Tools can tag BRIEF.md content with ontology entries using HTML comments:
+
+```markdown
+## Core Themes
+<!-- brief:ontology theme-pack nostalgia "Nostalgia" -->
+- Restlessness without resolution
+```
+
+Format: `<!-- brief:ontology {packName} {entryId} "{label}" -->`. Tags are advisory annotations — they enable cross-project search but do not change the meaning of the content.
+
+### Memory Management
+
+- Use LRU eviction for loaded pack indexes (recommended budget: 100 MB)
+- Staleness detection: reload if on-disk file is newer than cached version (check interval: 60s)
+- Maximum individual pack size: 50 MB
+
+---
+
+## Type Guide System (Planned)
+
+> **Status:** Type guides are implemented in the MCP reference server but no guides have been formally published. The format is subject to change.
+
+### What Type Guides Are
+
+Type guides are domain-specific templates that help tools bootstrap BRIEF.md files for particular project types. When a user creates a `song` project, a type guide for `song` can suggest relevant extensions, ontologies, known creative tensions, and quality signals.
+
+Type guides are markdown files with YAML frontmatter stored at `~/.brief/type-guides/{type}.md`.
+
+### Type Guide Format
+
+```yaml
+---
+type: song
+bootstrapping: true
+source: bundled
+version: "1.0"
+conflict_patterns:
+  - ["emotion", "clarity"]
+  - ["simplicity", "depth"]
+suggested_extensions:
+  - name: SONIC ARTS
+    subsections:
+      - name: Sound Palette
+        mode: ontology
+        ontology: music-theory
+suggested_ontologies:
+  - name: music-theory
+    description: "Scales, modes, harmonic concepts"
+---
+```
+
+The markdown body contains guidance organised into universal dimensions.
+
+### Universal Dimensions
+
+All type guides share these structural categories:
+
+| Dimension | Purpose |
+|---|---|
+| Medium & Discipline | What form the work takes |
+| Primary Activities | What creative/technical work is involved |
+| Outputs & Deliverables | What the project produces |
+| Audience & Expectations | Who it's for and what they expect |
+| Success Criteria | How to evaluate the result |
+| Known Tensions | Common creative/technical trade-offs for this type |
+| Quality Signals | Indicators that the work is succeeding |
+
+### Conflict Patterns
+
+The `conflict_patterns` field lists common tensions for the project type. These serve two purposes: surfacing trade-offs early during onboarding, and suppressing false positives in conflict detection when opposing decisions match a known tension.
+
+### Source Tracking
+
+| Source | Meaning |
+|---|---|
+| `bundled` | Ships with the tool |
+| `ai_generated` | Created by AI during a session |
+| `community` | From a shared community repository |
+| `user_edited` | Modified by the user |
+
+---
+
+## Project Maturity Assessment
+
+Tools can assess a project's lifecycle phase by analysing the structure and density of its BRIEF.md file. This helps tools calibrate their guidance.
+
+### Maturity Levels
+
+| Level | Decision Count | Characteristics |
+|---|---|---|
+| **Nascent** | 0–2 | Project just starting. Many sections empty. Focus on capturing initial intent. |
+| **Developing** | 3–5 | Core identity established. Decisions accumulating. Good time to suggest format upgrades. |
+| **Maturing** | 6–10 | Rich decision history. Relationships between decisions emerging. Conflict checking becomes valuable. |
+| **Established** | 11+ | Comprehensive record. Focus shifts to maintenance and superseding outdated decisions. |
+
+### Signals Tracked
+
+- **Section fill-state:** which core sections have content vs. are empty
+- **Decision format:** count of minimal-format vs. full-format decisions
+- **Upgradeable decisions:** minimal decisions missing WHAT, WHY, WHEN, or ALTERNATIVES fields
+- **Open question count:** unresolved questions (both to-resolve and to-keep-open)
+- **Superseded decision count:** how many decisions have been replaced over time
+
+Tools use maturity signals to tailor prompts: e.g., in a "developing" project, suggest upgrading minimal decisions to full format with rationale.
+
+---
+
+## Configuration
+
+### Directory Layout
+
+The reference implementation uses `~/.brief/` as the configuration root:
+
+```
+~/.brief/
+  config.json              # User configuration
+  ontologies/              # Installed ontology packs
+    theme-pack/
+      pack.json
+  type-guides/             # Type guide files
+    _generic.md            # Fallback bootstrapping guide
+    song.md
+```
+
+### Key Configuration Settings
+
+| Setting | Default | Description |
+|---|---|---|
+| `workspaces` | `["~/projects"]` | Directories to scan for BRIEF.md projects |
+| `hierarchy_depth_limit` | 10 | Max levels to walk up when discovering context |
+| `context_size_limit` | 50 KB | Max accumulated context size from hierarchy walk |
+| `project_scan_depth` | 5 | Max depth when scanning for projects within a workspace |
+| `operation_timeout` | 30s | Timeout for file operations |
+| `max_pack_size` | 50 MB | Maximum size for a single ontology pack |
+| `index_memory_budget` | 100 MB | Memory limit for all loaded ontology indexes |
+| `write_lock_timeout` | 10s | Timeout for atomic write locks |
+| `index_staleness_period` | 60s | How often to check if cached pack data is stale |
+
+On Unix systems, `config.json` should be created with mode `0600` and subdirectories with `0700`.
 
 ---
 
@@ -558,6 +754,56 @@ If you want to add BRIEF.md support to your tool, here's a minimal integration p
 - Feed BRIEF.md content to AI tools at session start
 - Propose BRIEF.md updates after working sessions
 - Check AI output against documented constraints
+
+#### Session Re-entry
+
+When an AI tool starts a new conversation about an existing project, it should perform a re-entry sequence rather than starting from scratch:
+
+1. Load the full BRIEF.md content for the active project
+2. Walk up the hierarchy for parent context
+3. Surface open questions (especially "To Resolve") as natural conversation starters
+4. Report maturity signals so guidance is calibrated to the project's lifecycle phase
+5. Note any external sessions captured since the last conversation
+
+This turns session start from "what are we working on?" into "here's where we left off."
+
+#### Interaction Patterns
+
+AI tools working with BRIEF.md projects should implement these patterns:
+
+| # | Pattern | Description |
+|---|---|---|
+| 1 | Session Start | Load full project state, open questions, and maturity signals at conversation start |
+| 2 | Decision Capture | Recognise when users make decisions in conversation and offer to record them |
+| 3 | Question Surfacing | Identify unresolved questions during work and prompt the user to log them |
+| 4 | External Session | After discussing work done in another tool, offer to capture it |
+| 5 | Conflict Resolution | When adding decisions that may conflict with existing ones, surface the conflict |
+| 6 | Extension Setup | When project context suggests a domain framework would help, suggest relevant extensions |
+| 7 | Ontology Exploration | When users need vocabulary for a domain, guide them through ontology browsing |
+| 8 | Collaborative Authoring | When writing sections, ask the user first, draft based on input, then refine |
+| 9 | Type Guide Review | At project creation, surface the type guide and walk through its dimensions |
+| 10 | Type Guide Creation | When no guide exists for a project type, offer to create one |
+
+#### Decision Recognition
+
+AI tools should watch for commitment language ("I'll go with X", "let's use X", "decided to...") and offer to record decisions. Key principles:
+
+- **Confirm before recording** — if it's unclear whether something is a decision or thinking aloud, ask
+- **Avoid over-logging** — only record choices that affect project direction, constrain future work, or would be non-obvious to someone joining later
+- **Use appropriate format** — full format (WHAT/WHY/WHEN/ALTERNATIVES) when alternatives were weighed; minimal format when the choice was straightforward
+- **Respect deliberation** — if the user is still deliberating, log as an Open Question, not a decision
+- **Capture retroactively** — if a past decision surfaces in conversation, offer to backfill it
+
+#### Question Surfacing
+
+AI tools should actively identify and surface open questions. Key principles:
+
+- **Distinguish placeholders from questions** — "TBD" is not necessarily an open question
+- **Prioritise blocking questions** — questions that block progress over nice-to-resolve ones
+- **Don't re-surface logged questions** — check if a question is already recorded before raising it
+- **Offer structured parameters** — log questions with Options and Impact fields when possible
+- **Respect deferrals** — if a user wants to skip a question, don't insist on logging it
+- **Present at re-entry** — open questions are natural conversation starters at session start
 
 ---
 

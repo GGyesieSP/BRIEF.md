@@ -2,7 +2,7 @@
 **Type:** open_standard
 **Status:** development
 **Created:** 2026-01-15
-**Updated:** 2026-02-10
+**Updated:** 2026-03-16
  
 # What This Is
 An open specification for a lightweight, human-readable context file

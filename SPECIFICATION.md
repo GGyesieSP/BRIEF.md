@@ -1,10 +1,10 @@
-# BRIEF.md Specification v1.0
+# BRIEF.md Specification v2.0
 
 **Author:** Gyles Gyesie
 **ORCID:** [0009-0008-3394-9243](https://orcid.org/0009-0008-3394-9243)
 **License:** CC-BY 4.0
 **DOI:** 10.5281/zenodo.18614773 (White Paper)
-**Date:** February 2026
+**Date:** March 2026
 
 ## What Is BRIEF.md?
 
@@ -22,8 +22,9 @@ Place it at the root of any project folder. No tools required. Readable by human
 
 Create a file called `BRIEF.md` in your project folder with at minimum:
 
+**Music example:**
 ```markdown
-**Project:** My Project Name
+**Project:** Echo Valley
 **Type:** song
 **Created:** 2026-02-08
 
@@ -32,6 +33,27 @@ A folk song about small-town restlessness told through late-night train imagery.
 
 # Why This Exists
 To capture the feeling of wanting to leave but being stuck.
+
+# Key Decisions
+(Leave empty until you make a decision worth remembering.)
+
+# Open Questions
+(Leave empty until you have unresolved questions.)
+```
+
+**Software example:**
+```markdown
+**Project:** brief-validate
+**Type:** cli_tool
+**Created:** 2026-03-01
+
+# What This Is
+A CLI tool that validates BRIEF.md files against the specification and
+reports errors with suggested fixes.
+
+# Why This Exists
+Tool builders need a way to verify their BRIEF.md output is spec-compliant.
+Currently there's no way to validate without reading the spec manually.
 
 # Key Decisions
 (Leave empty until you make a decision worth remembering.)
@@ -71,7 +93,7 @@ You don't need BRIEF.md for every project. Quick experiments, one-off tasks, and
 
 ## File Structure
 
-Every BRIEF.md has up to four parts:
+BRIEF.md can include the following four parts:
 
 ```
 ┌─────────────────────────────────────┐
@@ -120,7 +142,7 @@ Every BRIEF.md begins with structured metadata:
 | **Extensions** | Which conceptual frameworks apply | `sonic_arts, narrative_creative` |
 | **Status** | Current project state | `concept`, `development`, `production`, `released` |
 | **Updated** | Last modified date | `2026-02-01` |
-| **Version** | Which spec version this file follows | `1.0` |
+| **Version** | Which spec version this file follows | `2.0` |
 
 ### Metadata Format
 
@@ -131,6 +153,24 @@ Fields use the format `**FieldName:** value` (bold markdown). Tools SHOULD be le
 ## Part 2: Core Sections (Required)
 
 Five sections that work for any project in any domain. Include at least one; aim for all five as the project develops.
+
+### Internationalisation
+
+Tools SHOULD accept core section headings in common languages. The canonical headings are English, but these aliases are equivalent:
+
+| English (canonical) | German | French | Spanish | Portuguese | Japanese |
+|---|---|---|---|---|---|
+| What This Is | Was das ist | Qu'est-ce que c'est | Que es esto | O que e isso | これは何か |
+| What This Is NOT | Was das nicht ist | Ce que ce n'est pas | Que no es esto | O que nao e | これでないもの |
+| Why This Exists | Warum es das gibt | Pourquoi cela existe | Por que existe | Por que existe | なぜ存在するか |
+| Key Decisions | Wichtige Entscheidungen | Décisions clés | Decisiones clave | Decisões principais | 主要な決定 |
+| Open Questions | Offene Fragen | Questions ouvertes | Preguntas abiertas | Perguntas abertas | 未解決の質問 |
+
+Matching is case-insensitive. Tools that write BRIEF.md files SHOULD output the canonical English headings. Tools that read BRIEF.md files SHOULD accept all aliases.
+
+Additional English aliases are also accepted:
+- "Decisions" or "Design Decisions" → Key Decisions
+- "Questions" or "Unresolved" → Open Questions
 
 ---
 
@@ -232,6 +272,37 @@ changes. Keeping the narrator in bed, still listening, makes the final line
 
 Both formats are valid. The minimal format is still a decision record with rationale; it's just less formal. Use the full format when you want to remember the alternatives you rejected.
 
+**Decision relationship fields** (optional, for linking decisions to each other):
+
+| Field | Purpose | Effect on Referenced Decision |
+|---|---|---|
+| **REPLACES:** | This decision supersedes a prior one | Referenced decision becomes inactive |
+| **EXCEPTION TO:** | Creates a scoped exception to an active decision | Referenced decision stays active |
+| **AMENDS:** | Modifies an earlier decision without fully replacing it | Both decisions stay active |
+| **RESOLVED FROM:** | Links back to an Open Question this decision resolved | Traceability link only |
+| **SUPERSEDED BY:** | Passive marker added to the original when replaced | Added automatically or manually |
+
+All relationship fields reference decisions by their title text (the H3 heading or the text after WHAT:).
+
+**Example with relationships:**
+```markdown
+### WHAT: Switch to room mic blend instead of close-mic only
+**WHY:** The close-mic captured detail but lost the natural room decay.
+Blending a room mic at ~30% preserves detail while adding spatial depth.
+**WHEN:** 2026-02-10
+**REPLACES:** Close-mic the guitar exclusively
+**ALTERNATIVES CONSIDERED:**
+- Keep close-mic only — rejected: too clinical for the aesthetic
+- Room mic only — rejected: lost too much pick detail
+
+### WHAT: Use feature flags for gradual rollout
+**WHY:** Direct deployment to all users caused a support spike last release.
+Feature flags let us validate with 10% of users before full rollout.
+**WHEN:** 2026-02-12
+**REPLACES:** Deploy directly to all users
+**RESOLVED FROM:** How should we handle risky deployments?
+```
+
 ---
 
 ### 5. Open Questions
@@ -299,18 +370,32 @@ indie-folk, slowcore
 - Adrianne Lenker: songs/instrumentals (guitar tone)
 ```
 
-### Available Extensions
+```markdown
+# STRATEGIC PLANNING
 
-Extensions are community-maintained. Initial extensions under development:
+## Goals
+- Reduce onboarding time for new engineers from 2 weeks to 3 days
+- Achieve 95% spec compliance across all generated BRIEF.md files
 
-- **SONIC ARTS**: aesthetic, sound, production
-- **NARRATIVE CREATIVE**: themes, story, perspective
-- **LYRICAL CRAFT**: word choice, imagery, constraints
-- **VISUAL STORYTELLING**: visual style, cinematography
-- **STRATEGIC PLANNING**: goals, constraints, assumptions
-- **SYSTEM DESIGN**: architecture, requirements, constraints
+## Constraints
+- Must work offline (no cloud dependencies)
+- Budget: one engineer for 6 weeks
+- Cannot break existing CI/CD pipelines
 
-Extensions are defined in separate specification documents. Anyone can propose a new extension: for now, proposals are welcome as GitHub issues.
+## Assumptions
+- Teams already use markdown for documentation
+- Git is the primary version control system
+
+## References: Strategic
+- Shape Up (Basecamp) — appetite-based scoping
+- Team Topologies — cognitive load as a design constraint
+```
+
+### Defining Extensions
+
+No extensions have been formally published yet. The examples above (SONIC ARTS, STRATEGIC PLANNING, etc.) illustrate the pattern — they are not stable specifications.
+
+Anyone can propose a new extension. Proposals are welcome as GitHub issues. Each extension specification should document its name, purpose, required and optional subsections, and any recommended ontologies.
 
 ---
 
@@ -326,7 +411,29 @@ Conversational delivery, not performative. Think talking to someone
 in the next room, not singing to an audience.
 ```
 
+```markdown
+# DEPLOYMENT SPECIFIC
+
+## Rollout Strategy
+Canary deployment to 5% of traffic, then gradual ramp over 48 hours.
+Automatic rollback if error rate exceeds 0.5%.
+```
+
 If project-specific content becomes common across multiple projects, consider proposing it as a new extension.
+
+---
+
+## Recording External Tool Sessions
+
+When work in an external tool (Figma, a DAW, a design tool, etc.) produces decisions or artefacts worth preserving, record a breadcrumb in a dedicated section:
+
+```markdown
+# External Tool Sessions
+- 2026-02-14 Figma: 1 decision captured — Album cover uses train silhouette
+- 2026-02-16 Miro: 1 decision captured — Architecture uses event-driven pattern
+```
+
+Each line records the date, tool name, and a summary of what was captured. Associated decisions are recorded in the Key Decisions section with the **WHEN** field matching the session date, giving tools a way to correlate sessions with their decisions.
 
 ---
 
@@ -336,7 +443,7 @@ If project-specific content becomes common across multiple projects, consider pr
 
 **Folder nesting = context nesting.** No explicit links needed.
 
-When a tool opens a BRIEF.md, it walks up the directory tree and reads any parent BRIEF.md files it finds. Context accumulates automatically.
+Tools that implement hierarchy support walk up the directory tree, reading any parent BRIEF.md files they find. Context accumulates from each level. This behaviour is opt-in at the tool level — not all tools are required to implement it.
 
 ```
 the-wanderers/                  # Artist
@@ -502,6 +609,76 @@ First person, present tense. The narrator is in the moment, not reflecting.
 - Jason Isbell — small-town specificity
 ```
 
+### Complete Example: Software Project
+
+```markdown
+**Project:** brief-validate
+**Type:** cli_tool
+**Extensions:** system_design
+**Status:** development
+**Created:** 2026-02-20
+**Updated:** 2026-03-10
+
+# What This Is
+A CLI tool that validates BRIEF.md files against the specification and reports
+errors with suggested fixes. Written in Python, distributed via pip.
+
+# What This Is NOT
+- Not a BRIEF.md editor or IDE plugin (validation only)
+- Not a linter for markdown generally (BRIEF.md-specific rules only)
+- Not a tool that modifies files (read-only by design)
+
+# Why This Exists
+Tool builders need a way to verify their BRIEF.md output is spec-compliant.
+Creators need a way to check their files before sharing. Currently there's no
+way to validate without reading the spec manually.
+
+# Key Decisions
+
+### WHAT: Use exit codes to indicate validation severity
+**WHY:** CI pipelines need a machine-readable signal. Exit 0 = valid,
+exit 1 = errors found, exit 2 = warnings only. This lets teams gate
+merges on BRIEF.md validity without custom scripting.
+**WHEN:** 2026-02-25
+**ALTERNATIVES CONSIDERED:**
+- JSON output only — rejected: requires parsing, not pipeline-friendly
+- Always exit 0 with report — rejected: no way to fail a build
+
+### Validate structure only, not prose quality
+Prose quality is subjective and domain-specific. The tool checks that
+required sections exist and metadata is well-formed, not whether the
+content is useful.
+
+# Open Questions
+
+## To Resolve
+- [ ] Should the tool auto-detect spec version from the file, or require
+      it as a flag?
+      **Options:** Auto-detect from Version field / Require --spec-version
+      flag / Default to latest, allow override
+      **Impact:** Auto-detect is friendlier but may guess wrong on files
+      missing the Version field.
+
+## To Keep Open
+- Whether validation should eventually cover extension-specific rules
+  (this depends on how extensions evolve and may not have one answer)
+
+# SYSTEM DESIGN
+
+## Architecture
+Single-pass parser with pluggable rule engine. Rules are pure functions
+that receive parsed BRIEF.md and return diagnostics.
+
+## Technical Constraints
+- Python 3.9+ (no external dependencies for core validation)
+- Must handle files up to 10,000 lines without noticeable delay
+- UTF-8 only (per spec requirement)
+
+## References: Technical
+- ruff — fast Python linter (architecture inspiration)
+- markdownlint — rule-based markdown validation approach
+```
+
 ---
 
 ## License
@@ -512,8 +689,8 @@ This specification is released under **CC-BY 4.0**. Implementations may use any 
 
 ## Status and Contributing
 
-This specification is **v1.0-draft** (February 2026), pre-release, and seeking feedback.
+This specification is **v2.0** (March 2026).
 
-There is no formal governance yet. If you have feedback, edge cases, critiques, or alternative designs, please open an issue or discussion. This project values clarity over consensus at this stage.
+Governance processes will be established as the community grows. For now, proposals and feedback are welcome as GitHub issues or discussions.
 
 For tool implementation details, interoperability guidelines, and advanced topics, see the [Implementation Guide](IMPLEMENTATION_GUIDE.md).
