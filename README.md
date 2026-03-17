@@ -88,30 +88,27 @@ BRIEF.md is the counter-position: context owned by the creator, readable by any 
 
 ```
  .
- ├── SPECIFICATION.md       # The core spec (~400 lines). Start here.
+ ├── SPECIFICATION.md        # The core spec. Start here.
  ├── IMPLEMENTATION_GUIDE.md # For tool builders and advanced users
- ├── README.md              # This file
- ├── LICENSE                # CC-BY 4.0 License
+ ├── CHANGELOG.md            # Version history
+ ├── README.md               # This file
+ ├── LICENSE                  # CC-BY 4.0 License
  └── BRIEF_md_White_Paper.pdf # Theoretical foundation and research questions
  ```
 
 ## Status
 
-This specification is **v1.0-draft** and pre-release. Feedback, critique, and alternative approaches are explicitly welcome.
+This specification is **v2.0** (March 2026). Feedback, critique, and alternative approaches are welcome.
 
 ## Contributing
 
-There is no formal governance yet. If you have feedback, edge cases, critiques, or alternative designs, please open an issue or discussion. This project values clarity over consensus at this stage.
+Governance processes will be established as the community grows. For now, proposals and feedback are welcome as GitHub issues or discussions.
 
 ## Author
 
 Created by Gyles Gyesie ([ORCID](https://orcid.org/0009-0008-3394-9243)).
 
 **DOI:** [10.5281/zenodo.18614773](https://doi.org/10.5281/zenodo.18614773) (White Paper)
-
-BRIEF.md synthesises architectural decision records, project identity files, and domain-specific metadata into a portable, hierarchical context artifact, and applies it to creative work for the first time.
-
-The concept of *context decay* as applied to project workflows, the BRIEF.md specification, and the supporting theoretical framework were originated by Gyles Gyesie in 2025–2026.
 
 ## License
 
